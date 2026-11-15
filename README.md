@@ -3,7 +3,7 @@
 ![Language](https://img.shields.io/badge/language-Rust-orange.svg)
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS%20%7C%20Android-darkred.svg)
 ![Architecture](https://img.shields.io/badge/arch-x86--64%20%7C%20ARM64%20%7C%20RISC--V-blue.svg)
-![Version](https://img.shields.io/badge/version-4.0%20alpha-purple.svg)
+![Version](https://img.shields.io/badge/version-1.0-purple.svg)
 
 A single native program (written in Rust) that measures a machine and tells you **what it is good for**: a virtualization host, a NAS, a media / video server, a game server, local AI (LLM), graphics or ray tracing. Every test uses a fixed, deterministic workload, so results from different computers, phones and boards can be compared with each other later. Results are saved as JSON, text, HTML and CSV.
 

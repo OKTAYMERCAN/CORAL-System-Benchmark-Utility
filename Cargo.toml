@@ -1,6 +1,6 @@
 [package]
 name = "syscheck"
-version = "4.0.0-alpha.1"
+version = "1.0.0"
 edition = "2021"
 description = "CORAL System Benchmark Utility: reproducible, cross-platform system benchmark and suitability analyzer (x86-64, ARM64, RISC-V)"
 license = "GPL-3.0-only"

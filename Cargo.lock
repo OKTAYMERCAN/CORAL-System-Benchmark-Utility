@@ -1011,7 +1011,7 @@ dependencies = [
 
 [[package]]
 name = "syscheck"
-version = "4.0.0-alpha.1"
+version = "1.0.0"
 dependencies = [
  "bytemuck",
  "clap",
