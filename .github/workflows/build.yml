@@ -1,0 +1,43 @@
+name: build
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  test-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo test --release
+      - run: cargo build --release
+  cross:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [aarch64-unknown-linux-gnu, riscv64gc-unknown-linux-gnu, armv7-unknown-linux-gnueabihf, aarch64-linux-android]
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo install cross --git https://github.com/cross-rs/cross
+      - run: cross build --release --target ${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with: { name: "syscheck-${{ matrix.target }}", path: "target/${{ matrix.target }}/release/syscheck" }
+  macos:
+    runs-on: macos-latest # Apple Silicon
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo test --release
+      - run: cargo build --release
+      - uses: actions/upload-artifact@v4
+        with: { name: syscheck-aarch64-apple-darwin, path: target/release/syscheck }
+  windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x86_64-pc-windows-msvc, aarch64-pc-windows-msvc]
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup target add ${{ matrix.target }}
+      - run: cargo test --release --target ${{ matrix.target }}
+        if: matrix.target == 'x86_64-pc-windows-msvc'
+      - run: cargo build --release --target ${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with: { name: "syscheck-${{ matrix.target }}", path: "target/${{ matrix.target }}/release/syscheck.exe" }

@@ -1,0 +1,36 @@
+[package]
+name = "syscheck"
+version = "4.0.0-alpha.1"
+edition = "2021"
+description = "CORAL System Benchmark Utility: reproducible, cross-platform system benchmark and suitability analyzer (x86-64, ARM64, RISC-V)"
+license = "GPL-3.0-only"
+repository = "https://github.com/OKTAYMERCAN/CORAL-System-Benchmark-Utility"
+publish = false
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+flate2 = "1"
+wgpu = { version = "30", optional = true }
+pollster = { version = "1", optional = true }
+bytemuck = { version = "1", optional = true }
+
+[features]
+default = ["gpu"]
+# GPU compute / ray-tracing tests (wgpu: Vulkan, Metal, DirectX 12, OpenGL ES). Build with --no-default-features to leave them out.
+gpu = ["dep:wgpu", "dep:pollster", "dep:bytemuck"]
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_IO"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
