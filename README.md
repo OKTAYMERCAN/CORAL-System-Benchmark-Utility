@@ -7,6 +7,9 @@
 
 A single native program (written in Rust) that measures a machine and tells you **what it is good for**: a virtualization host, a NAS, a media / video server, a game server, local AI (LLM), graphics or ray tracing. Every test uses a fixed, deterministic workload, so results from different computers, phones and boards can be compared with each other later. Results are saved as JSON, text, HTML and CSV.
 
+**⬇️ Download:** ready-made builds are on the [Releases page](https://github.com/OKTAYMERCAN/CORAL-System-Benchmark-Utility/releases).
+**📚 Documentation:** see the [Wiki](https://github.com/OKTAYMERCAN/CORAL-System-Benchmark-Utility/wiki) (the pages live in the [`docs/`](docs) folder).
+
 The program is called `syscheck` on the command line. It has no installer and no runtime: one binary, no Python, no pip, no browser.
 
 ## 🚀 Key Features

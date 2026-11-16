@@ -2,8 +2,8 @@
 //!
 //! Tests against a remote server (real network): TCP throughput with 1 and 4 streams in both
 //! directions, bidirectional, round-trip time (64 B echo, p50 / p99 / jitter) and a message-size
-//! sweep. Without a server the same tests run against a loopback server and are labelled
-//! "loopback" (they measure the local TCP stack, not the network). The default gateway is probed
+//! sweep. With `--net-loopback` the same tests run against a local server and are labelled
+//! "loopback" (they measure the local TCP stack, not the network); this is off by default. The default gateway is probed
 //! with TCP connects (a refused connection still proves the round trip).
 //!
 //! Protocol (all integers little endian), client -> server header of 24 bytes:

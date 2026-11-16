@@ -1,0 +1,38 @@
+name: wiki
+
+# Keeps the GitHub Wiki in sync with the docs/ folder. Edit the pages in docs/ (pull requests work),
+# never in the Wiki tab: the next sync would overwrite those edits.
+# One-time setup: open the Wiki tab and save a first page, so that GitHub creates the wiki.
+on:
+  push:
+    branches: [main]
+    paths: ["docs/**", ".github/workflows/wiki.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish docs/ to the wiki
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          if ! git clone "https://x-access-token:${TOKEN}@github.com/${REPO}.wiki.git" wiki; then
+            echo "::error::The wiki does not exist yet. Open the Wiki tab, save a first page, then re-run this workflow."
+            exit 1
+          fi
+          find wiki -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -r docs/. wiki/
+          # Pages link to each other as Page-Name.md so they also work when browsing docs/ on GitHub;
+          # the wiki wants Page-Name without the extension.
+          find wiki -name '*.md' -exec sed -i -E 's/\]\(([A-Za-z0-9_-]+)\.md(#[^)]*)?\)/](\1\2)/g' {} +
+          cd wiki
+          git add -A
+          if git diff --cached --quiet; then echo "Wiki is up to date."; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Sync docs from ${GITHUB_SHA::7}"
+          git push

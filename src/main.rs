@@ -101,7 +101,7 @@ struct RunArgs {
     /// Use synchronous writes (O_DSYNC) in the disk test
     #[arg(long)]
     disk_sync: bool,
-    /// Network test server (`syscheck serve` on another machine). Without it, a loopback test runs
+    /// Network test server (`syscheck serve` on another machine). Without it, the network test is skipped
     #[arg(long)]
     net_server: Option<String>,
     /// Also run the network test against a local loopback server (measures this machine's TCP stack, not the network)
