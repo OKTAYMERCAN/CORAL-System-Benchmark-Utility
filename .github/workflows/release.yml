@@ -1,12 +1,23 @@
 name: release
 
-# Push a tag such as v1.0.0 to build every platform and publish a GitHub Release.
+# Builds every platform and publishes a GitHub Release. Two ways to start it:
+#  * push a tag such as v1.0.0, or
+#  * Actions tab -> release -> "Run workflow" and type the tag (the tag is created for you).
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag, for example v1.0.0 (must match the version in Cargo.toml)"
+        required: true
+        default: "v1.0.0"
 
 permissions:
   contents: write
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   build:
@@ -25,15 +36,16 @@ jobs:
       - name: Check that the tag matches the version in Cargo.toml
         shell: bash
         run: |
-          want="${GITHUB_REF_NAME#v}"
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo "Tag '$TAG' must look like v1.2.3"; exit 1; fi
+          want="${TAG#v}"
           have="$(grep -m1 '^version' Cargo.toml | sed -E 's/version *= *"([^"]+)"/\1/')"
-          if [ "$want" != "$have" ]; then echo "Tag $GITHUB_REF_NAME does not match Cargo.toml version $have"; exit 1; fi
+          if [ "$want" != "$have" ]; then echo "Tag $TAG does not match Cargo.toml version $have"; exit 1; fi
       - run: rustup target add ${{ matrix.target }}
       - run: cargo build --release --target ${{ matrix.target }}
       - name: Package
         shell: bash
         run: |
-          ver="${GITHUB_REF_NAME#v}"
+          ver="${TAG#v}"
           dir="syscheck-${ver}-${{ matrix.name }}"
           mkdir "$dir"
           if [[ "${{ matrix.target }}" == *windows* ]]; then
@@ -66,8 +78,8 @@ jobs:
       - name: Publish the release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
           REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
         run: |
           cd dist
           sha256sum syscheck-* > SHA256SUMS
@@ -88,4 +100,4 @@ jobs:
 
           On macOS the downloaded program is not signed: if the system refuses to open it, run `xattr -d com.apple.quarantine syscheck` once.
           NOTES
-          gh release create "$TAG" --repo "$REPO" --title "CORAL System Benchmark Utility ${TAG#v}" --notes-file notes.md syscheck-* SHA256SUMS
+          gh release create "$TAG" --repo "$REPO" --target "$SHA" --title "CORAL System Benchmark Utility ${TAG#v}" --notes-file notes.md syscheck-* SHA256SUMS
